@@ -1,68 +1,72 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik_data:/etc/traefik
+      - traefik_certificates:/letsencrypt
+      - ./traefik/traefik_dynamic_config.yaml:/etc/traefik/dynamic.yaml
+    environment:
+      - CLOUDFLARE_API_TOKEN=your-api-token
+    command:
+      - "--api=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"
+      - "--providers.file.filename=/etc/traefik/dynamic.yaml"
+      - "--certificatesresolvers.cloudflare.acme.dnschallenge=true"
+      - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.cloudflare.acme.email=your-email@example.com"
+      - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
+
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
     restart: always
-    ports:
-      - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`port.lippok.dev`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls.certresolver=cloudflare"
 
-  nginx-proxy-manager:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: nginx-proxy-manager
+  gatus:
+    image: twinproduction/gatus:latest
+    container_name: gatus
     restart: always
-    ports:
-      - "80:80"
-      - "81:81"
-      - "443:443"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gatus.rule=Host(`gatus.lippok.dev`)"
+      - "traefik.http.routers.gatus.entrypoints=websecure"
+      - "traefik.http.routers.gatus.tls.certresolver=cloudflare"
     environment:
-      DB_MYSQL_HOST: "db"
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: "npm"
-      DB_MYSQL_PASSWORD: "npm"
-      DB_MYSQL_NAME: "npm"
+      - "GATUS_CONFIG_FILE=/config/config.yaml"
     volumes:
-      - npm_data:/data
-      - npm_letsencrypt:/etc/letsencrypt
+      - ./gatus:/config
 
-  db:
-    image: jc21/mariadb-aria:latest
-    container_name: npm-db
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: "rootpassword"
-      MYSQL_DATABASE: "npm"
-      MYSQL_USER: "npm"
-      MYSQL_PASSWORD: "npm"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`olympus.lippok.dev`)"
+      - "traefik.http.routers.homepage.entrypoints=websecure"
+      - "traefik.http.routers.homepage.tls.certresolver=cloudflare"
     volumes:
-      - db_data:/var/lib/mysql
-
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
-    restart: always
-    ports:
-      - "3001:3001"
-    volumes:
-      - uptime-kuma_data:/app/data
-
-  homer:
-    image: b4bz/homer:latest
-    container_name: homer
-    restart: always
-    ports:
-      - "8080:8080"
-    volumes:
-      - homer_data:/www/assets
+      - /homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
+  traefik_data:
+  traefik_certificates:
   portainer_data:
-  npm_data:
-  npm_letsencrypt:
-  db_data:
-  uptime-kuma_data:
-  homer_data:

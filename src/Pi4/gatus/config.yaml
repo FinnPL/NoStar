@@ -1,0 +1,96 @@
+services:
+  - name: "Mail Server Lippok"
+    url: "https://mail.lippok.eu"
+    checks:
+      - type: "ping"
+        url: "ping://mail.lippok.eu"
+      - type: "http"
+        url: "https://mail.lippok.eu"
+        ssl: true
+        threshold: 2000
+        conditions:
+          - "[STATUS] == 200"
+      - type: "imap"
+        url: "imap://mail.lippok.eu"
+        ssl: true
+        threshold: 2000
+      - type: "pop"
+        url: "pop://mail.lippok.eu"
+        ssl: true
+        threshold: 2000
+      - type: "smtp"
+        url: "smtp://mail.lippok.eu"
+        ssl: true
+        threshold: 2000
+
+  - name: "Apollo NAS"
+    checks:
+      - type: "http"
+        url: "https://apollo.lippok.dev"
+        ssl: true
+        threshold: 2000
+        conditions:
+          - "[STATUS] == 200"
+      - type: "ping"
+        url: "ping://apollo.athena"
+
+  - name: "Olympus Page"
+    checks:
+      - type: "http"
+        url: "https://olympus.lippok.dev"
+        ssl: true
+        threshold: 2000
+        conditions:
+          - "[STATUS] == 200"
+
+  - name: "Router Minerva"
+    checks:
+      - type: "ping"
+        url: "ping://10.0.0.1"
+
+  - name: "Portainer"
+    checks:
+      - type: "http"
+        url: "https://port.lippok.dev"
+        ssl: true
+        threshold: 2000
+        conditions:
+          - "[STATUS] == 200"
+      - type: "ping"
+        url: "ping://port.lippok.dev"
+
+  - name: "FritzBox"
+    checks:
+      - type: "ping"
+        url: "ping://192.168.178.1"
+      - type: "http"
+        url: "https://fb.lippok.dev"
+        ssl: true
+        threshold: 2000
+        conditions:
+          - "[STATUS] == 200"
+
+  - name: "pi3 Athena"
+    checks:
+      - type: "ping"
+        url: "ping://pi3.athena"
+
+  - name: "NAS Zeus"
+    checks:
+      - type: "http"
+        url: "https://zeus.lippok.dev"
+        ssl: true
+        threshold: 2000
+        conditions:
+          - "[STATUS] == 200"
+      - type: "ping"
+        url: "ping://zeus.athena"
+
+  - name: "Router Vieta"
+    checks:
+      - type: "ping"
+        url: "ping://10.10.0.1"
+
+alerting:
+  discord:
+    webhook-url: "YOUR_DISCORD_WEBHOOK_URL"

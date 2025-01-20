@@ -1,0 +1,54 @@
+http:
+  routers:
+    appolo-proxy:
+      rule: "Host(`appolo.lippok.dev`)"
+      service: appolo-nas
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: cloudflare
+
+    fb-proxy:
+      rule: "Host(`fb.lippok.dev`)"
+      service: fb-service
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: cloudflare
+
+    minerva-proxy:
+      rule: "Host(`minerva.eos.lippok.dev`)"
+      service: minerva-service
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: cloudflare
+
+    zeus-proxy:
+      rule: "Host(`zeus.lippok.dev`)"
+      service: zeus-service
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: cloudflare
+      
+  services:
+    appolo-nas:
+      loadBalancer:
+        servers:
+          - url: "http://apollo.athena:5000"
+
+    fb-service:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.178.1:80"
+
+    minerva-service:
+      loadBalancer:
+        servers:
+          - url: "http://pi3.athena:3001"
+
+    zeus-service:
+      loadBalancer:
+        servers:
+          - url: "http://zeus.athena:80"
