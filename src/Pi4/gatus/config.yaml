@@ -1,96 +1,144 @@
-services:
+storage:
+  type: sqlite
+  path: /data/data.db
+
+endpoints:
   - name: "Mail Server Lippok"
+    group: "Mail Servers"
+    url: "icmp://mail.lippok.eu"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
+  - name: "Mail Server Lippok HTTP"
+    group: "Mail Servers"
     url: "https://mail.lippok.eu"
-    checks:
-      - type: "ping"
-        url: "ping://mail.lippok.eu"
-      - type: "http"
-        url: "https://mail.lippok.eu"
-        ssl: true
-        threshold: 2000
-        conditions:
-          - "[STATUS] == 200"
-      - type: "imap"
-        url: "imap://mail.lippok.eu"
-        ssl: true
-        threshold: 2000
-      - type: "pop"
-        url: "pop://mail.lippok.eu"
-        ssl: true
-        threshold: 2000
-      - type: "smtp"
-        url: "smtp://mail.lippok.eu"
-        ssl: true
-        threshold: 2000
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
+      - "[CERTIFICATE_EXPIRATION] < 72h"
+  - name: "Mail Server Lippok IMAP"
+    group: "Mail Servers"
+    url: "imap://mail.lippok.eu"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
+  - name: "Mail Server Lippok POP"
+    group: "Mail Servers"
+    url: "pop://mail.lippok.eu"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
+  - name: "Mail Server Lippok SMTP"
+    group: "Mail Servers"
+    url: "smtp://mail.lippok.eu"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
 
   - name: "Apollo NAS"
-    checks:
-      - type: "http"
-        url: "https://apollo.lippok.dev"
-        ssl: true
-        threshold: 2000
-        conditions:
-          - "[STATUS] == 200"
-      - type: "ping"
-        url: "ping://apollo.athena"
+    group: "NAS"
+    url: "https://apollo.lippok.dev"
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
+      - "[CERTIFICATE_EXPIRATION] < 72h"
+  - name: "Apollo NAS Ping"
+    group: "NAS"
+    url: "icmp://apollo.athena"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
 
   - name: "Olympus Page"
-    checks:
-      - type: "http"
-        url: "https://olympus.lippok.dev"
-        ssl: true
-        threshold: 2000
-        conditions:
-          - "[STATUS] == 200"
+    group: "Web Servers"
+    url: "https://olympus.lippok.dev"
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
+      - "[CERTIFICATE_EXPIRATION] < 72h"
 
   - name: "Router Minerva"
-    checks:
-      - type: "ping"
-        url: "ping://10.0.0.1"
+    group: "Routers"
+    url: "icmp://10.0.0.1"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
 
   - name: "Portainer"
-    checks:
-      - type: "http"
-        url: "https://port.lippok.dev"
-        ssl: true
-        threshold: 2000
-        conditions:
-          - "[STATUS] == 200"
-      - type: "ping"
-        url: "ping://port.lippok.dev"
+    group: "Web Servers"
+    url: "https://port.lippok.dev"
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
+      - "[CERTIFICATE_EXPIRATION] < 72h"
+  - name: "Portainer Ping"
+    group: "Web Servers"
+    url: "icmp://port.lippok.dev"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
 
   - name: "FritzBox"
-    checks:
-      - type: "ping"
-        url: "ping://192.168.178.1"
-      - type: "http"
-        url: "https://fb.lippok.dev"
-        ssl: true
-        threshold: 2000
-        conditions:
-          - "[STATUS] == 200"
+    group: "Routers"
+    url: "icmp://192.168.178.1"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
+  - name: "FritzBox HTTP"
+    group: "Routers"
+    url: "https://fb.lippok.dev"
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
+      - "[CERTIFICATE_EXPIRATION] < 72h"
 
   - name: "pi3 Athena"
-    checks:
-      - type: "ping"
-        url: "ping://pi3.athena"
+    group: "Servers"
+    url: "icmp://pi3.athena"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
 
   - name: "NAS Zeus"
-    checks:
-      - type: "http"
-        url: "https://zeus.lippok.dev"
-        ssl: true
-        threshold: 2000
-        conditions:
-          - "[STATUS] == 200"
-      - type: "ping"
-        url: "ping://zeus.athena"
+    group: "NAS"
+    url: "https://zeus.lippok.dev"
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CONNECTED] == true"
+      - "[RESPONSETIME] < 2000"
+      - "[CERTIFICATE_EXPIRATION] < 72h"
+  - name: "NAS Zeus Ping"
+    group: "NAS"
+    url: "icmp://zeus.athena"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
 
   - name: "Router Vieta"
-    checks:
-      - type: "ping"
-        url: "ping://10.10.0.1"
+    group: "Routers"
+    url: "icmp://10.10.0.1"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
+
+storage:
+  type: sqlite
+  path: /data/data.db
 
 alerting:
   discord:
-    webhook-url: "YOUR_DISCORD_WEBHOOK_URL"
+    webhook-url: "${DISCORD_WEBHOOK_URL}"

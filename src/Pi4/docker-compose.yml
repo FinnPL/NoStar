@@ -14,22 +14,31 @@ services:
       - traefik_certificates:/letsencrypt
       - ./traefik/traefik_dynamic_config.yaml:/etc/traefik/dynamic.yaml
     environment:
-      - CLOUDFLARE_API_TOKEN=your-api-token
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_KEY}
     command:
-      - "--api=false"
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--providers.docker=true"
+      - "--middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD}"
       - "--providers.file.filename=/etc/traefik/dynamic.yaml"
       - "--certificatesresolvers.cloudflare.acme.dnschallenge=true"
       - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
-      - "--certificatesresolvers.cloudflare.acme.email=your-email@example.com"
+      - "--certificatesresolvers.cloudflare.acme.email=${CLOUDFLARE_EMAIL}"
       - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.traefik.address=:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.lippok.dev`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
 
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
     restart: always
+    command: --admin-password ${PORTAINER_PASSWORD}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
@@ -43,30 +52,41 @@ services:
     image: twinproduction/gatus:latest
     container_name: gatus
     restart: always
+    environment:
+      - "GATUS_CONFIG_FILE=/config/config.yaml"
+      - "DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gatus.rule=Host(`gatus.lippok.dev`)"
       - "traefik.http.routers.gatus.entrypoints=websecure"
       - "traefik.http.routers.gatus.tls.certresolver=cloudflare"
-    environment:
-      - "GATUS_CONFIG_FILE=/config/config.yaml"
     volumes:
       - ./gatus:/config
+      - gatus_data:/data
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     restart: always
+    environment:
+      - "HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY=${HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY}"
+      - "HOMEPAGE_VAR_TRAEFIK_USER=${TRAEFIK_USER}"
+      - "HOMEPAGE_VAR_TRAEFIK_PASSWORD=${TRAEFIK_PASSWORD}"
+      - "HOMEPAGE_VAR_UNIFI_USER=${HOMEPAGE_VAR_UNIFI_USER}"
+      - "HOMEPAGE_VAR_UNIFI_PASSWORD=${HOMEPAGE_VAR_UNIFI_PASSWORD}"
+      - "HOMEPAGE_VAR_MAILCOW_API_KEY=${HOMEPAGE_VAR_MAILCOW_API_KEY}"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homepage.rule=Host(`olympus.lippok.dev`)"
       - "traefik.http.routers.homepage.entrypoints=websecure"
       - "traefik.http.routers.homepage.tls.certresolver=cloudflare"
     volumes:
-      - /homepage:/app/config
+      - ./homepage:/app/config
+      - ./homepage/images:/app/images
       - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   traefik_data:
   traefik_certificates:
   portainer_data:
+  gatus_data:
