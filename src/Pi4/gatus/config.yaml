@@ -9,7 +9,12 @@ endpoints:
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
-  - name: "Mail Server Lippok HTTP"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
+
+  - name: "Mail Server Lippok HTTPS"
     group: "Mail Servers"
     url: "https://mail.lippok.eu"
     interval: 30s
@@ -17,30 +22,37 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 72h"
+      - "[CERTIFICATE_EXPIRATION] < 24h"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
+
   - name: "Mail Server Lippok IMAP"
     group: "Mail Servers"
-    url: "imap://mail.lippok.eu"
+    url: "tcp://mail.lippok.eu:993"
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-  - name: "Mail Server Lippok POP"
-    group: "Mail Servers"
-    url: "pop://mail.lippok.eu"
-    interval: 30s
-    conditions:
-      - "[CONNECTED] == true"
-      - "[RESPONSETIME] < 2000"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
+
   - name: "Mail Server Lippok SMTP"
     group: "Mail Servers"
-    url: "smtp://mail.lippok.eu"
+    url: "tcp://mail.lippok.eu:587"
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
-  - name: "Apollo NAS"
+  - name: "Apollo NAS HTTPS"
     group: "NAS"
     url: "https://apollo.lippok.dev"
     interval: 30s
@@ -48,13 +60,22 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 72h"
+      - "[CERTIFICATE_EXPIRATION] < 24h"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
+
   - name: "Apollo NAS Ping"
     group: "NAS"
     url: "icmp://apollo.athena"
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
   - name: "Olympus Page"
     group: "Web Servers"
@@ -64,14 +85,11 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 72h"
-
-  - name: "Router Minerva"
-    group: "Routers"
-    url: "icmp://10.0.0.1"
-    interval: 30s
-    conditions:
-      - "[CONNECTED] == true"
+      - "[CERTIFICATE_EXPIRATION] < 24h"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
   - name: "Portainer"
     group: "Web Servers"
@@ -81,13 +99,11 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 72h"
-  - name: "Portainer Ping"
-    group: "Web Servers"
-    url: "icmp://port.lippok.dev"
-    interval: 30s
-    conditions:
-      - "[CONNECTED] == true"
+      - "[CERTIFICATE_EXPIRATION] < 24h"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
   - name: "FritzBox"
     group: "Routers"
@@ -95,7 +111,12 @@ endpoints:
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
-  - name: "FritzBox HTTP"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
+
+  - name: "FritzBox HTTPS"
     group: "Routers"
     url: "https://fb.lippok.dev"
     interval: 30s
@@ -103,7 +124,11 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 72h"
+      - "[CERTIFICATE_EXPIRATION] < 24h"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
   - name: "pi3 Athena"
     group: "Servers"
@@ -111,6 +136,10 @@ endpoints:
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
   - name: "NAS Zeus"
     group: "NAS"
@@ -120,13 +149,22 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 72h"
+      - "[CERTIFICATE_EXPIRATION] < 24h"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
+
   - name: "NAS Zeus Ping"
     group: "NAS"
     url: "icmp://zeus.athena"
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
   - name: "Router Vieta"
     group: "Routers"
@@ -134,10 +172,21 @@ endpoints:
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
-storage:
-  type: sqlite
-  path: /data/data.db
+  - name: "Router Minerva"
+    group: "Routers"
+    url: "icmp://10.0.0.1"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
 
 alerting:
   discord:

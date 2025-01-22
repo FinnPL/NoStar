@@ -7,9 +7,9 @@
         type: portainer
         url: "https://port.lippok.dev"
         env: 1
-        key: API_KEY
-  
-  - Gatus:
+        key: {{HOMEPAGE_VAR_PORTAINER_API_KEY}}
+
+    - Gatus:
       description: Service Monitoring
       href: "https://gatus.lippok.dev"
       icon: gatus.png
@@ -27,7 +27,7 @@
         username: {{HOMEPAGE_VAR_TRAEFIK_USER}} 
         password: {{HOMEPAGE_VAR_TRAEFIK_PASSWORD}}
 
-  - Vieta:
+    - Vieta:
       description: Unifi Router Management
       href: "unifi.ui.com"
       icon: vieta.png

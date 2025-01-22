@@ -1,41 +1,24 @@
-version: '3.8'
-
 services:
   traefik:
     image: traefik:latest
     container_name: traefik
     restart: always
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - traefik_data:/etc/traefik
-      - traefik_certificates:/letsencrypt
-      - ./traefik/traefik_dynamic_config.yaml:/etc/traefik/dynamic.yaml
+      - 80:80
+      - 443:443
     environment:
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_KEY}
-    command:
-      - "--api.dashboard=true"
-      - "--api.insecure=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.docker=true"
-      - "--middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD}"
-      - "--providers.file.filename=/etc/traefik/dynamic.yaml"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge=true"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
-      - "--certificatesresolvers.cloudflare.acme.email=${CLOUDFLARE_EMAIL}"
-      - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
-      - "--entrypoints.traefik.address=:8080"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.lippok.dev`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
+      - "TRAEFIK_USER=${TRAEFIK_USER}"
+      - "TRAEFIK_PASSWORD=${TRAEFIK_PASSWORD}"
+      - "CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}"
+      - "CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/traefik_dynamic.yml:/etc/traefik/traefik_dynamic.yml:ro
+      - traefik_certs:/certs
 
   portainer:
-    image: portainer/portainer-ce
+    image: portainer/portainer-ce:latest
     container_name: portainer
     restart: always
     command: --admin-password ${PORTAINER_PASSWORD}
@@ -46,23 +29,25 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.portainer.rule=Host(`port.lippok.dev`)"
       - "traefik.http.routers.portainer.entrypoints=websecure"
-      - "traefik.http.routers.portainer.tls.certresolver=cloudflare"
+      - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
 
   gatus:
     image: twinproduction/gatus:latest
     container_name: gatus
     restart: always
     environment:
-      - "GATUS_CONFIG_FILE=/config/config.yaml"
+      - "GATUS_CONFIG_PATH=/etc/gatus"
       - "DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}"
+    volumes:
+      - ./gatus:/etc/gatus:ro
+      - gatus_data:/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gatus.rule=Host(`gatus.lippok.dev`)"
       - "traefik.http.routers.gatus.entrypoints=websecure"
-      - "traefik.http.routers.gatus.tls.certresolver=cloudflare"
-    volumes:
-      - ./gatus:/config
-      - gatus_data:/data
+      - "traefik.http.routers.gatus.tls.certresolver=letsencrypt"
+      - "traefik.http.services.gatus.loadbalancer.server.port=8080"
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
@@ -75,18 +60,19 @@ services:
       - "HOMEPAGE_VAR_UNIFI_USER=${HOMEPAGE_VAR_UNIFI_USER}"
       - "HOMEPAGE_VAR_UNIFI_PASSWORD=${HOMEPAGE_VAR_UNIFI_PASSWORD}"
       - "HOMEPAGE_VAR_MAILCOW_API_KEY=${HOMEPAGE_VAR_MAILCOW_API_KEY}"
+      - "HOMEPAGE_VAR_PORTAINER_API_KEY=${HOMEPAGE_VAR_PORTAINER_API_KEY}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./homepage:/app/config
+      - ./homepage/images:/app/images
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homepage.rule=Host(`olympus.lippok.dev`)"
       - "traefik.http.routers.homepage.entrypoints=websecure"
-      - "traefik.http.routers.homepage.tls.certresolver=cloudflare"
-    volumes:
-      - ./homepage:/app/config
-      - ./homepage/images:/app/images
-      - /var/run/docker.sock:/var/run/docker.sock
+      - "traefik.http.routers.homepage.tls.certresolver=letsencrypt"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
 
 volumes:
-  traefik_data:
-  traefik_certificates:
+  traefik_certs:
   portainer_data:
   gatus_data:

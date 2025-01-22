@@ -1,0 +1,71 @@
+http:
+  middlewares:
+    dashboard-auth:
+      basicAuth:
+        users:
+          - "{{env "TRAEFIK_USER"}}:{{env "TRAEFIK_PASSWORD"}}"
+
+  routers:
+    api:
+      rule: "Host(`traefik.lippok.dev`)"
+      entrypoints:
+       - websecure
+      middlewares:
+       - dashboard-auth
+      service: api@internal
+      tls:
+        certResolver: letsencrypt
+
+    appolo:
+      rule: "Host(`appolo.lippok.dev`)"
+      entrypoints:
+       - websecure
+      service: appolo-service
+      tls:
+        certResolver: letsencrypt
+
+    fb:
+      rule: "Host(`fb.lippok.dev`)"
+      entrypoints:
+       - websecure
+      service: fb-service
+      tls:
+        certResolver: letsencrypt
+
+    minerva:
+      rule: "Host(`minerva.eos.lippok.dev`)"
+      entrypoints:
+       - websecure
+      service: minerva-service
+      tls:
+        certResolver: letsencrypt
+
+    zeus:
+      rule: "Host(`zeus.lippok.dev`)"
+      entrypoints:
+       - websecure
+      service: zeus-service
+      tls:
+        certResolver: letsencrypt
+
+  services:
+  
+    appolo-service:
+      loadBalancer:
+        servers:
+          - url: "http://apollo.athena:5000"
+
+    fb-service:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.178.1:80"
+
+    minerva-service:
+      loadBalancer:
+        servers:
+          - url: "http://pi3.athena:3001"
+
+    zeus-service:
+      loadBalancer:
+        servers:
+          - url: "http://zeus.athena:80"
