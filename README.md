@@ -20,6 +20,8 @@
     htpasswd -nb -B admin password | cut -d ":" -f 2
     ```
     Replace `password` with your desired password. Copy the generated hash and use it in your `.env` file.
+    
+    **Note:** Edit traefik.yml to include your email address.
 
 3. Start Docker in daemon mode:
     ```sh

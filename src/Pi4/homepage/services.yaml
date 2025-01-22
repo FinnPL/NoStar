@@ -9,13 +9,13 @@
         env: 1
         key: {{HOMEPAGE_VAR_PORTAINER_API_KEY}}
 
-    - Gatus:
-      description: Service Monitoring
-      href: "https://gatus.lippok.dev"
-      icon: gatus.png
-      widget:
-        type: gatus
-        url: "https://gatus.lippok.dev"
+  - Gatus:
+    description: Service Monitoring
+    href: "https://gatus.lippok.dev"
+    icon: gatus.png
+    widget:
+      type: gatus
+      url: "https://gatus.lippok.dev"
 
   - Traefik:
       description: Reverse Proxy
@@ -27,16 +27,16 @@
         username: {{HOMEPAGE_VAR_TRAEFIK_USER}} 
         password: {{HOMEPAGE_VAR_TRAEFIK_PASSWORD}}
 
-    - Vieta:
-      description: Unifi Router Management
-      href: "unifi.ui.com"
-      icon: vieta.png
-      widget:
-        type: unifi
-        url: 10.10.0.1
-        username: {{HOMEPAGE_VAR_UNIFI_USER}}
-        password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
-        site: Vieta
+  - Vieta:
+    description: Unifi Router Management
+    href: "unifi.ui.com"
+    icon: vieta.png
+    widget:
+      type: unifi
+      url: 10.10.0.1
+      username: {{HOMEPAGE_VAR_UNIFI_USER}}
+      password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
+      site: Vieta
 
   - Apollo:
       description: NAS
