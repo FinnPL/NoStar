@@ -22,7 +22,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 24h"
+      - "[CERTIFICATE_EXPIRATION] > 24h"
     alerts:
       - type: discord
         failure-threshold: 1
@@ -60,7 +60,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 24h"
+      - "[CERTIFICATE_EXPIRATION] > 24h"
     alerts:
       - type: discord
         failure-threshold: 1
@@ -85,7 +85,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 24h"
+      - "[CERTIFICATE_EXPIRATION] > 24h"
     alerts:
       - type: discord
         failure-threshold: 1
@@ -99,7 +99,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 24h"
+      - "[CERTIFICATE_EXPIRATION] > 24h"
     alerts:
       - type: discord
         failure-threshold: 1
@@ -124,7 +124,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 24h"
+      - "[CERTIFICATE_EXPIRATION] > 24h"
     alerts:
       - type: discord
         failure-threshold: 1
@@ -149,7 +149,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CONNECTED] == true"
       - "[RESPONSETIME] < 2000"
-      - "[CERTIFICATE_EXPIRATION] < 24h"
+      - "[CERTIFICATE_EXPIRATION] > 24h"
     alerts:
       - type: discord
         failure-threshold: 1

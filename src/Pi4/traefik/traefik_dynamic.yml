@@ -16,11 +16,11 @@ http:
       tls:
         certResolver: letsencrypt
 
-    appolo:
-      rule: "Host(`appolo.lippok.dev`)"
+    apollo:
+      rule: "Host(`apollo.lippok.dev`)"
       entrypoints:
        - websecure
-      service: appolo-service
+      service: apollo-service
       tls:
         certResolver: letsencrypt
 
@@ -50,7 +50,7 @@ http:
 
   services:
   
-    appolo-service:
+    apollo-service:
       loadBalancer:
         servers:
           - url: "http://apollo.athena:5000"
