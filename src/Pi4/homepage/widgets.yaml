@@ -1,8 +1,5 @@
 - resources:
     cpu: true
-    disk: true
-    diskUnits: bytes
-    expanded: true
     memory: true
     refresh: 3000
     units: metric
@@ -25,7 +22,7 @@
 - datetime:
     text_size: sm
     format:
-      dateStyle: long
-      timeStyle: long
+      dateStyle: short
+      timeStyle: short
       hour12: true
       timeZone: 'Europe/Berlin'
