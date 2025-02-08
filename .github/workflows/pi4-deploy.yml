@@ -11,7 +11,10 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
-            
+
+            - name: Clear Env File
+              run: echo "" > src/Pi4/.env
+
             - name: Set up Env File
               run: |
                 echo "TRAEFIK_USER=${{ secrets.TRAEFIK_USER }}" >> src/Pi4/.env
