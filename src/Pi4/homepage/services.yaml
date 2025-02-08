@@ -52,6 +52,35 @@
         url: "https://mail.lippok.eu"
         key: {{HOMEPAGE_VAR_MAILCOW_API_KEY}}
 
+  - Minerva:
+      description: Unifi Controller
+      href: "https://unifi.ui.com"
+      icon: unifi.png
+      widget:
+        type: unifi
+        url: "https://10.0.0.1"
+        username: {{HOMEPAGE_VAR_UNIFI_USER}}
+        password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
+
+  - Pi3 Portainer:
+      description: Remote Docker Container Management
+      href: "https://port.lippok.dev"
+      icon: portainer.png
+      widget:
+        type: portainer
+        url: "https://port.lippok.dev"
+        env: 6
+        key: {{HOMEPAGE_VAR_PORTAINER_API_KEY}}
+
+  - UptimeKuma:
+      description: Uptime Monitoring
+      href: "https://minerva.eos.lippok.dev"
+      icon: uptimekuma.png
+      widget:
+        type: uptimekuma
+        url: "https://minerva.eos.lippok.dev"
+        slug: services
+
   - FritzBox:
       description: Router Management
       href: "https://fb.lippok.dev"

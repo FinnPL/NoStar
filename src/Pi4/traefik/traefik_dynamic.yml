@@ -48,6 +48,14 @@ http:
       tls:
         certResolver: letsencrypt
 
+    uptimekuma:
+      rule: "Host(`minerva.eos.lippok.dev`)"
+      entrypoints:
+        - websecure
+      service: uptimekuma-service
+      tls:
+        certResolver: letsencrypt
+
   services:
   
     apollo-service:
@@ -69,3 +77,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://zeus.athena:80"
+
+    uptimekuma-service:
+      loadBalancer:
+        servers:
+          - url: "http://pi3.athena:3001"
