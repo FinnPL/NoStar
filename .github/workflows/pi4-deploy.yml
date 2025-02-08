@@ -22,18 +22,18 @@ jobs:
 
             - name: Set up Env File
               run: |
-                echo "TRAEFIK_USER=${{ secrets.TRAEFIK_USER }}" >> src/Pi4/.env
-                echo "TRAEFIK_PASSWORD=${{ secrets.TRAEFIK_PASSWORD }}" >> src/Pi4/.env
-                echo "TRAEFIK_PASSWORD_UNHASHED=${{ secrets.TRAEFIK_PASSWORD_UNHASHED }}" >> src/Pi4/.env
-                echo "CF_DNS_API_TOKEN=${{ secrets.CF_DNS_API_TOKEN }}" >> src/Pi4/.env
-                echo "CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }}" >> src/Pi4/.env
-                echo "PORTAINER_PASSWORD=${{ secrets.PORTAINER_PASSWORD }}" >> src/Pi4/.env
-                echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" >> src/Pi4/.env
-                echo "HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY=${{ secrets.HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY }}" >> src/Pi4/.env
-                echo "HOMEPAGE_VAR_MAILCOW_API_KEY=${{ secrets.HOMEPAGE_VAR_MAILCOW_API_KEY }}" >> src/Pi4/.env
-                echo "HOMEPAGE_VAR_UNIFI_USER=${{ secrets.HOMEPAGE_VAR_UNIFI_USER }}" >> src/Pi4/.env
-                echo "HOMEPAGE_VAR_UNIFI_PASSWORD=${{ secrets.HOMEPAGE_VAR_UNIFI_PASSWORD }}" >> src/Pi4/.env
-                echo "HOMEPAGE_VAR_PORTAINER_API_KEY=${{ secrets.HOMEPAGE_VAR_PORTAINER_API_KEY }}" >> src/Pi4/.env
+                echo 'TRAEFIK_USER=${{ secrets.TRAEFIK_USER }}' >> src/Pi4/.env
+                echo 'TRAEFIK_PASSWORD=${{ secrets.TRAEFIK_PASSWORD }}' >> src/Pi4/.env
+                echo 'TRAEFIK_PASSWORD_UNHASHED=${{ secrets.TRAEFIK_PASSWORD_UNHASHED }}' >> src/Pi4/.env
+                echo 'CF_DNS_API_TOKEN=${{ secrets.CF_DNS_API_TOKEN }}' >> src/Pi4/.env
+                echo 'CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }}' >> src/Pi4/.env
+                echo 'PORTAINER_PASSWORD=${{ secrets.PORTAINER_PASSWORD }}' >> src/Pi4/.env
+                echo 'DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}' >> src/Pi4/.env
+                echo 'HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY=${{ secrets.HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY }}' >> src/Pi4/.env
+                echo 'HOMEPAGE_VAR_MAILCOW_API_KEY=${{ secrets.HOMEPAGE_VAR_MAILCOW_API_KEY }}' >> src/Pi4/.env
+                echo 'HOMEPAGE_VAR_UNIFI_USER=${{ secrets.HOMEPAGE_VAR_UNIFI_USER }}' >> src/Pi4/.env
+                echo 'HOMEPAGE_VAR_UNIFI_PASSWORD=${{ secrets.HOMEPAGE_VAR_UNIFI_PASSWORD }}' >> src/Pi4/.env
+                echo 'HOMEPAGE_VAR_PORTAINER_API_KEY=${{ secrets.HOMEPAGE_VAR_PORTAINER_API_KEY }}' >> src/Pi4/.env
             
             - name: Stop existing containers
               run: docker compose -f src/Pi4/docker-compose.yml down
