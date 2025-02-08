@@ -28,10 +28,10 @@ jobs:
                 echo "HOMEPAGE_VAR_PORTAINER_API_KEY=${{ secrets.HOMEPAGE_VAR_PORTAINER_API_KEY }}" >> src/Pi4/.env
             
             - name: Stop existing containers
-              run: docker-compose -f src/Pi4/docker-compose.yml down
+              run: docker compose -f src/Pi4/docker-compose.yml down
 
             - name: Pull latest images
-              run: docker-compose -f src/Pi4/docker-compose.yml pull
+              run: docker compose -f src/Pi4/docker-compose.yml pull
 
             - name: Start containers
-              run: docker-compose -f src/Pi4/docker-compose.yml up -d
+              run: docker compose -f src/Pi4/docker-compose.yml up -d
