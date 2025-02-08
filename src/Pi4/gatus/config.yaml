@@ -52,7 +52,7 @@ endpoints:
         failure-threshold: 1
         success-threshold: 2
 
-  - name: "Apollo NAS HTTPS"
+  - name: "Apollo NAS"
     group: "NAS"
     url: "https://apollo.lippok.dev"
     interval: 30s

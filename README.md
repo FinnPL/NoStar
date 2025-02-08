@@ -1,5 +1,14 @@
 # NoStar - Homelab Setup
-## Getting Started
+This repository contains the configuration files for my homelab setup.
+The setup is based on Docker and Traefik as a reverse proxy.
+
+## Pi4 Setup
+### CI Setup
+1. Download the latest runner package
+2. Configure the runner
+3. Ensure Runner Auto-Restarts using Systemd
+
+### Manual Setup
 
 1. Clone the repository:
     ```sh
@@ -30,7 +39,6 @@
 
 4. Configure the Portainer password and obtain the Portainer API key:
     - Access Portainer at `https://port.lippok.dev`
-    - Set up your admin password
     - Navigate to the API section to get your API key
 
 5. Enter the Portainer API key in the `.env` file:
