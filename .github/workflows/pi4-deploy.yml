@@ -8,9 +8,11 @@ jobs:
     deploy:
         runs-on: pi4
         environment: Pi4
+        permissions:
+            contents: read
         steps:
-            - name: Change file permissions
-              run: chmod 777 src/Pi4/homepage/logs/homepage.log
+            - name: Remove log file
+              run: sudo rm -f src/Pi4/homepage/logs/homepage.log
 
             - name: Checkout repository
               uses: actions/checkout@v4
