@@ -1,5 +1,6 @@
 # NoStar - Homelab Setup
 [![Pi4 - Deploy Docker Compose](https://github.com/FinnPL/NoStar/actions/workflows/pi4-deploy.yml/badge.svg)](https://github.com/FinnPL/NoStar/actions/workflows/pi4-deploy.yml)
+[![Docker Compose Syntax Check](https://github.com/FinnPL/NoStar/actions/workflows/docker-syntax.yml/badge.svg)](https://github.com/FinnPL/NoStar/actions/workflows/docker-syntax.yml)
 
 This repository contains the configuration files for my homelab setup.
 The setup is based on Docker and Traefik as a reverse proxy.
