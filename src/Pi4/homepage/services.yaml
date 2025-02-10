@@ -79,7 +79,7 @@
       widget:
         type: uptimekuma
         url: "https://minerva.eos.lippok.dev"
-        slug: services
+        slug: eos
 
   - FritzBox:
       description: Router Management
