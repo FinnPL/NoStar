@@ -6,6 +6,10 @@ on:
       - '**/docker-compose*.yml'
       - '**/docker-compose*.yaml'
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   scan:
     runs-on: ubuntu-latest
