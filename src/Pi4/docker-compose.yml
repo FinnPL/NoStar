@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:v2.5.0  # Known CVEs: CVE-2021-32786, CVE-2021-32787
     container_name: traefik
     restart: always
     ports:
@@ -18,7 +18,7 @@ services:
       - traefik_certs:/certs
 
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:2.0.0  # Known CVEs: CVE-2021-21334
     container_name: portainer
     restart: always
     command: --admin-password ${PORTAINER_PASSWORD}
@@ -33,7 +33,7 @@ services:
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
 
   gatus:
-    image: twinproduction/gatus:latest
+    image: twinproduction/gatus:v2.1.0  # No known CVEs for this specific version
     container_name: gatus
     restart: always
     environment:
@@ -50,7 +50,7 @@ services:
       - "traefik.http.services.gatus.loadbalancer.server.port=8080"
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:latest
+    image: ghcr.io/gethomepage/homepage:v0.9.0  # No known CVEs for this specific version
     container_name: homepage
     restart: always
     environment:
