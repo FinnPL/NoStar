@@ -25,8 +25,12 @@ jobs:
           BASE_BRANCH=${{ github.event.pull_request.base.ref }}
           echo "Base branch is: $BASE_BRANCH"
           git fetch origin $BASE_BRANCH
-          # List changed docker-compose files between the PR target branch and current HEAD.
-          CHANGED=$(git diff --name-only origin/$BASE_BRANCH...HEAD | grep -i 'docker-compose.*\.ya\?ml' || true)
+          # Handle branches without a merge base
+          if git merge-base --is-ancestor origin/$BASE_BRANCH HEAD; then
+            CHANGED=$(git diff --name-only origin/$BASE_BRANCH...HEAD | grep -i 'docker-compose.*\.ya\?ml' || true)
+          else
+            CHANGED=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -i 'docker-compose.*\.ya\?ml' || true)
+          fi
           echo "Changed docker-compose files:"
           echo "$CHANGED"
           echo "files=$CHANGED" >> $GITHUB_OUTPUT
