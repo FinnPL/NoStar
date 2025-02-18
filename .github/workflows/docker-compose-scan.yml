@@ -1,92 +1,71 @@
-name: Docker Scout PR Analysis
+name: Docker Scout Scan
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
-
-permissions:
-  contents: read
-  issues: write
 
 jobs:
-  scout:
+  # First job: find images from docker-compose files and output a matrix JSON
+  find-images:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      # 1. Check out the PR code.
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      # 2. Install Docker Scout.
-      - name: Install Docker Scout
+      - name: Install jq and yq
         run: |
-          echo "Installing Docker Scout..."
-          curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh -o install-scout.sh
-          sh install-scout.sh
-
-      # 3. Verify Docker and Docker Scout versions.
-      - name: Verify Installation
-        run: |
-          echo "Docker version:"
-          docker --version
-          echo "Docker Scout version:"
-          docker scout version
-
-      # 4. Find any changed docker-compose files.
-      - name: Find changed docker-compose files
-        id: find-files
-        run: |
-          CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD | grep -Ei 'docker-compose\.(ya?ml)' || true)
-          echo "Found changed docker-compose files:"
-          echo "$CHANGED_FILES"
-          # Export files as an output (if multiple files, they’ll be whitespace separated)
-          echo "::set-output name=files::${CHANGED_FILES}"
-
-      # 5. Analyze Docker images and CVEs from the changed docker-compose files.
-      - name: Analyze Docker images in docker-compose files
-        id: analyze
-        run: |
-          OUTPUT_FILE="docker-scout-results.md"
-          echo "### Docker Scout Analysis" > $OUTPUT_FILE
-          echo "" >> $OUTPUT_FILE
-          echo "| Docker Image | Metadata | Open CVEs |" >> $OUTPUT_FILE
-          echo "|--------------|----------|-----------|" >> $OUTPUT_FILE
-
-          if [ -z "${{ steps.find-files.outputs.files }}" ]; then
-            echo "No docker-compose files changed." >> $OUTPUT_FILE
-          else
-            for file in ${{ steps.find-files.outputs.files }}; do
-              echo "Processing file: $file"
-              # Extract Docker image lines (adjust the regex if necessary)
-              IMAGES=$(grep -E '^\s*image:' "$file" | awk '{print $2}')
-              for image in $IMAGES; do
-                echo "Scanning image: $image"
-                # Retrieve image metadata (assuming Docker Scout outputs JSON)
-                METADATA=$(docker scout inspect "$image" --format '{{json .}}' 2>/dev/null || echo '{}')
-                # For demonstration, extract repository and tag (requires jq)
-                SHORT_META=$(echo "$METADATA" | jq -r 'if .Repository and .Tag then "\(.Repository)@\(.Tag)" else "N/A" end' 2>/dev/null)
-
-                # Get open CVEs for the image.
-                CVES=$(docker scout cves "$image" 2>/dev/null || echo "None")
-                # Remove newlines so the Markdown table remains intact.
-                CVES=$(echo "$CVES" | tr '\n' ' ')
-
-                # Append the results as a row in the Markdown table.
-                echo "| \`$image\` | $SHORT_META | $CVES |" >> $OUTPUT_FILE
-              done
-            done
+          sudo apt-get update && sudo apt-get install -y jq
+          # Install yq if not already installed
+          if ! command -v yq &>/dev/null; then
+            wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_amd64 -O /usr/local/bin/yq
+            chmod +x /usr/local/bin/yq
           fi
 
-          echo "Docker Scout Analysis:"
-          cat $OUTPUT_FILE
-          # Set the output so it can be used in the next step.
-          echo "::set-output name=result::$(cat $OUTPUT_FILE)"
+      - name: Find images in Docker Compose files
+        id: find
+        run: |
+          echo "Searching for docker-compose*.yml files..."
+          files=$(find . -type f -name "docker-compose*.yml")
+          echo "Found files:"
+          echo "$files"
+          images=()
+          for file in $files; do
+            echo "Processing $file"
+            # Use yq to extract all image fields from services
+            while IFS= read -r image; do
+              if [[ -n "$image" ]]; then
+                images+=("$image")
+              fi
+            done < <(yq e '.services[].image // empty' "$file")
+          done
+          # Remove duplicates (if any)
+          unique_images=($(echo "${images[@]}" | tr ' ' '\n' | sort -u))
+          echo "Unique images found: ${unique_images[@]}"
+          # Create a JSON array for the matrix
+          matrix=$(printf '%s\n' "${unique_images[@]}" | jq -R . | jq -s .)
+          echo "Matrix JSON: $matrix"
+          # Set the output for use in the next job
+          echo "::set-output name=matrix::$matrix"
 
-      # 6. Post a PR comment with the Docker Scout analysis.
-      - name: Comment on PR with Docker Scout results
-        uses: peter-evans/create-or-update-comment@v2
+      - name: Set matrix output
+        id: set-matrix
+        run: echo "matrix=${{ steps.find.outputs.matrix }}" >> $GITHUB_OUTPUT
+
+  # Second job: run Docker Scout scan for each image found
+  scan-images:
+    needs: find-images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ${{ fromJson(needs.find-images.outputs.matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Scan image with Docker Scout
+        id: scout
+        uses: docker/scout-action@v1
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ${{ steps.analyze.outputs.result }}
+          command: cves
+          image: ${{ matrix.image }}
