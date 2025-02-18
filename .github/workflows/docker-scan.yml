@@ -25,7 +25,7 @@ jobs:
         id: set-matrix
         run: |
           echo "Searching for docker-compose files..."
-          # Find both docker-compose.yml and docker-compose-*.yml in all subdirectories.
+          # Find docker-compose.yml and docker-compose-*.yml files in all subdirectories.
           files=$(find . -type f \( -iname "docker-compose.yml" -o -iname "docker-compose-*.yml" \))
           echo "Found files:"
           echo "$files"
@@ -49,8 +49,10 @@ jobs:
             matrix=$(printf '%s\n' "${unique_images[@]}" | jq -R . | jq -s .)
           fi
           echo "Matrix JSON: $matrix"
-          # Set the output using the new $GITHUB_OUTPUT method.
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          # Set the output using multiline syntax.
+          echo "matrix<<EOF" >> $GITHUB_OUTPUT
+          echo "$matrix" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
   scan-images:
     needs: find-images
