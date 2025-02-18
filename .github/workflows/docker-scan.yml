@@ -78,5 +78,6 @@ jobs:
         id: scout
         uses: docker/scout-action@v1
         with:
-          command: quickview
+          command: quickview,compare
           image: ${{ matrix.image }}
+          to-latest: true
