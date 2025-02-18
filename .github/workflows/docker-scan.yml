@@ -1,7 +1,10 @@
 name: Docker Scout Scan
-
 on:
   pull_request:
+  
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   find-images:
