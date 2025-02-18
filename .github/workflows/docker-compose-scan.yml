@@ -4,7 +4,6 @@ on:
   pull_request:
 
 jobs:
-  # First job: find images from docker-compose files and output a matrix JSON
   find-images:
     runs-on: ubuntu-latest
     outputs:
@@ -22,8 +21,8 @@ jobs:
             chmod +x /usr/local/bin/yq
           fi
 
-      - name: Find images in Docker Compose files
-        id: find
+      - name: Find images in Docker Compose files and set matrix
+        id: set-matrix
         run: |
           echo "Searching for docker-compose*.yml files..."
           files=$(find . -type f -name "docker-compose*.yml")
@@ -32,27 +31,26 @@ jobs:
           images=()
           for file in $files; do
             echo "Processing $file"
-            # Use yq to extract all image fields from services
+            # Extract image fields from each service
             while IFS= read -r image; do
               if [[ -n "$image" ]]; then
                 images+=("$image")
               fi
             done < <(yq e '.services[].image // empty' "$file")
           done
-          # Remove duplicates (if any)
-          unique_images=($(echo "${images[@]}" | tr ' ' '\n' | sort -u))
-          echo "Unique images found: ${unique_images[@]}"
-          # Create a JSON array for the matrix
-          matrix=$(printf '%s\n' "${unique_images[@]}" | jq -R . | jq -s .)
+          # If no images found, set matrix to an empty JSON array.
+          if [ ${#images[@]} -eq 0 ]; then
+            echo "No images found, setting matrix to []"
+            matrix="[]"
+          else
+            # Remove duplicates and convert to a JSON array.
+            unique_images=($(printf "%s\n" "${images[@]}" | sort -u))
+            matrix=$(printf '%s\n' "${unique_images[@]}" | jq -R . | jq -s .)
+          fi
           echo "Matrix JSON: $matrix"
-          # Set the output for use in the next job
-          echo "::set-output name=matrix::$matrix"
+          # Set the output using the new $GITHUB_OUTPUT method.
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
-      - name: Set matrix output
-        id: set-matrix
-        run: echo "matrix=${{ steps.find.outputs.matrix }}" >> $GITHUB_OUTPUT
-
-  # Second job: run Docker Scout scan for each image found
   scan-images:
     needs: find-images
     runs-on: ubuntu-latest
@@ -69,3 +67,4 @@ jobs:
         with:
           command: cves
           image: ${{ matrix.image }}
+
