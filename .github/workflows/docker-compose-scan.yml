@@ -18,20 +18,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 2. Install Docker Scout CLI extension
+      # 2. Install Docker Scout CLI binary manually.
       - name: Install Docker Scout CLI
         run: |
-          echo "Installing Docker Scout CLI extension..."
-          # Attempt to install the Docker Scout CLI extension.
-          docker extension install docker/scout-cli || { echo "Failed to install Docker Scout CLI extension. Please ensure it is available."; exit 1; }
+          echo "Downloading Docker Scout CLI binary..."
+          curl -fsSL https://github.com/docker/scout-cli/releases/download/latest/docker-scout-linux-amd64 -o docker-scout
+          chmod +x docker-scout
+          sudo mv docker-scout /usr/local/bin/docker-scout
 
-      # 3. Verify Docker Scout installation
+      # 3. Verify Docker and Docker Scout installation.
       - name: Verify Docker Scout CLI installation
         run: |
           echo "Docker version:"
           docker --version
           echo "Docker Scout version:"
-          docker scout version
+          docker-scout version
 
       # 4. Find any changed docker-compose files.
       - name: Find changed docker-compose files
@@ -41,9 +42,9 @@ jobs:
           CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD | grep -Ei 'docker-compose\.(ya?ml)' || true)
           echo "Found changed docker-compose files:"
           echo "$CHANGED_FILES"
-          # Export the files as an output (if multiple files, they’ll be whitespace separated).
+          # Export the file list as an output.
           echo "::set-output name=files::${CHANGED_FILES}"
-      
+
       # 5. Analyze Docker images and CVEs from the changed files.
       - name: Analyze Docker images in docker-compose files
         id: analyze
@@ -64,16 +65,17 @@ jobs:
               for image in $IMAGES; do
                 echo "Scanning image: $image"
 
-                # Use Docker Scout to inspect the image metadata.
-                METADATA=$(docker scout inspect "$image" --format '{{json .}}' 2>/dev/null || echo '{}')
-                # Extract repository and tag using jq (adjust as needed).
+                # Use the Docker Scout CLI to inspect image metadata.
+                METADATA=$(docker-scout inspect "$image" --format '{{json .}}' 2>/dev/null || echo '{}')
+                # For demonstration, extract repository and tag using jq (if available).
                 SHORT_META=$(echo "$METADATA" | jq -r 'if .Repository and .Tag then "\(.Repository)@\(.Tag)" else "N/A" end' 2>/dev/null)
 
-                # Get open CVEs (adjust the command/format as needed).
-                CVES=$(docker scout cves "$image" 2>/dev/null || echo "None")
-                # Remove newlines so the Markdown table remains intact.
+                # Get open CVEs.
+                CVES=$(docker-scout cves "$image" 2>/dev/null || echo "None")
+                # Remove newlines from CVES so the Markdown table stays intact.
                 CVES=$(echo "$CVES" | tr '\n' ' ')
 
+                # Append a row to the Markdown table.
                 echo "| \`$image\` | $SHORT_META | $CVES |" >> $OUTPUT_FILE
               done
             done
