@@ -24,14 +24,15 @@ jobs:
       - name: Find images in Docker Compose files and set matrix
         id: set-matrix
         run: |
-          echo "Searching for docker-compose*.yml files..."
-          files=$(find . -type f -name "docker-compose*.yml")
+          echo "Searching for docker-compose files..."
+          # Look for docker-compose.yml or docker-compose-*.yml in all subdirectories.
+          files=$(find . -type f \( -iname "docker-compose.yml" -o -iname "docker-compose-*.yml" \))
           echo "Found files:"
           echo "$files"
           images=()
           for file in $files; do
             echo "Processing $file"
-            # Extract image fields from each service
+            # Use yq to extract all image fields from services
             while IFS= read -r image; do
               if [[ -n "$image" ]]; then
                 images+=("$image")
@@ -67,4 +68,3 @@ jobs:
         with:
           command: cves
           image: ${{ matrix.image }}
-
