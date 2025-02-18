@@ -50,7 +50,7 @@ services:
       - "traefik.http.services.gatus.loadbalancer.server.port=8080"
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:v0.9.0  # No known CVEs for this specific version
+    image: gethomepage/homepage:v0.9.0  # No known CVEs for this specific version
     container_name: homepage
     restart: always
     environment:
