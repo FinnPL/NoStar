@@ -15,7 +15,7 @@ jobs:
       - name: Install jq and yq
         run: |
           sudo apt-get update && sudo apt-get install -y jq
-          # Install yq if not already installed
+          # Install yq (v4) if not already installed
           if ! command -v yq &>/dev/null; then
             wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_amd64 -O /usr/local/bin/yq
             chmod +x /usr/local/bin/yq
@@ -25,19 +25,19 @@ jobs:
         id: set-matrix
         run: |
           echo "Searching for docker-compose files..."
-          # Look for docker-compose.yml or docker-compose-*.yml in all subdirectories.
+          # Find both docker-compose.yml and docker-compose-*.yml in all subdirectories.
           files=$(find . -type f \( -iname "docker-compose.yml" -o -iname "docker-compose-*.yml" \))
           echo "Found files:"
           echo "$files"
           images=()
           for file in $files; do
             echo "Processing $file"
-            # Use yq to extract all image fields from services
+            # Use yq with the optional operator to extract the image field
             while IFS= read -r image; do
               if [[ -n "$image" ]]; then
                 images+=("$image")
               fi
-            done < <(yq e '.services[].image // empty' "$file")
+            done < <(yq e '.services[].image?' "$file")
           done
           # If no images found, set matrix to an empty JSON array.
           if [ ${#images[@]} -eq 0 ]; then
