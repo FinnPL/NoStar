@@ -1,82 +1,90 @@
-name: Docker Compose Image Metadata and CVE Scan
+name: Docker Scout PR Analysis
 
 on:
   pull_request:
-    paths:
-      - '**/docker-compose*.yml'
-      - '**/docker-compose*.yaml'
+    types: [opened, synchronize, reopened]
 
+# Set permissions to ensure we can create/update comments.
 permissions:
   contents: read
-  pull-requests: write
+  issues: write
 
 jobs:
-  scan:
+  scout:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
+      # 1. Check out the PR code.
+      - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Detect Changed docker-compose Files
-        id: files
-        run: |
-          # Get the target branch of the pull request from the event payload.
-          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
-          echo "Base branch is: $BASE_BRANCH"
-          git fetch origin $BASE_BRANCH
-          # Handle branches without a merge base
-          if git merge-base --is-ancestor origin/$BASE_BRANCH HEAD; then
-            CHANGED=$(git diff --name-only origin/$BASE_BRANCH...HEAD | grep -i 'docker-compose.*\.ya\?ml' || true)
-          else
-            CHANGED=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -i 'docker-compose.*\.ya\?ml' || true)
-          fi
-          echo "Changed docker-compose files:"
-          echo "$CHANGED"
-          echo "files<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGED" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-  
-      - name: Prepare Empty Report File
-        run: |
-          echo "Docker Compose Image Metadata and CVE Report" > report.txt
-          echo "=============================================" >> report.txt
-
-      - name: Scan docker-compose Files for Images and CVEs
-        if: steps.files.outputs.files != ''
-        run: |
-          # Loop over each changed docker-compose file.
-          for file in $(echo "${{ steps.files.outputs.files }}"); do
-            echo "Processing file: $file" >> report.txt
-            # Extract image names (assuming docker-compose syntax "image: <imagename>")
-            IMAGES=$(grep -oP 'image:\s*\K.+' "$file" | tr -d '"' )
-            if [ -z "$IMAGES" ]; then
-              echo "   No images found in $file" >> report.txt
-              continue
-            fi
-
-            for image in $IMAGES; do
-              echo "   Found image: $image" >> report.txt
-              # Run Docker Scout to check for CVEs.
-              echo "   Running docker scout cves $image ..." >> report.txt
-              SCOUT_OUTPUT=$(docker scout cves "$image" 2>&1 || echo "   Error scanning $image")
-              echo "$SCOUT_OUTPUT" >> report.txt
-            done
-            echo "---------------------------------------------" >> report.txt
-          done
-          # Display the final report.
-          cat report.txt
-
-      - name: Post PR Comment with the Report
-        if: steps.files.outputs.files != ''
-        uses: actions/github-script@v6
         with:
-          script: |
-            const fs = require('fs');
-            const report = fs.readFileSync('report.txt', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "## Docker Compose Image Metadata and CVE Scan Report\n```\n" + report + "\n```"
-            });
+          fetch-depth: 0
+
+      # 2. Ensure Docker (and Docker Scout) is available.
+      #    (Docker Scout is integrated into the Docker CLI in recent versions.)
+      - name: Set up Docker Scout
+        run: |
+          echo "Docker version:"
+          docker --version
+          echo "Docker Scout version:"
+          docker scout version
+
+      # 3. Find any changed docker-compose files.
+      - name: Find changed docker-compose files
+        id: find-files
+        run: |
+          # List changed files between the PR base and current HEAD
+          CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD | grep -Ei 'docker-compose\.(ya?ml)' || true)
+          echo "Found changed docker-compose files:"
+          echo "$CHANGED_FILES"
+          # Export as an output (if multiple files, they’ll be whitespace separated)
+          echo "::set-output name=files::${CHANGED_FILES}"
+      
+      # 4. Analyze Docker images and CVEs from the changed files.
+      - name: Analyze Docker images in docker-compose files
+        id: analyze
+        run: |
+          # Initialize the Markdown output
+          OUTPUT_FILE="docker-scout-results.md"
+          echo "### Docker Scout Analysis" > $OUTPUT_FILE
+          echo "" >> $OUTPUT_FILE
+          echo "| Docker Image | Metadata | Open CVEs |" >> $OUTPUT_FILE
+          echo "|--------------|----------|-----------|" >> $OUTPUT_FILE
+
+          if [ -z "${{ steps.find-files.outputs.files }}" ]; then
+            echo "No docker-compose files changed." >> $OUTPUT_FILE
+          else
+            for file in ${{ steps.find-files.outputs.files }}; do
+              echo "Processing file: $file"
+              # Extract lines that define an image (adjust the regex as needed)
+              IMAGES=$(grep -E '^\s*image:' "$file" | awk '{print $2}')
+              for image in $IMAGES; do
+                echo "Scanning image: $image"
+
+                # Use Docker Scout to inspect the image metadata.
+                # (Assumes that “docker scout inspect” outputs JSON; adjust formatting as needed.)
+                METADATA=$(docker scout inspect "$image" --format '{{json .}}' 2>/dev/null || echo '{}')
+                # For demonstration, extract repository and tag (requires jq).
+                SHORT_META=$(echo "$METADATA" | jq -r 'if .Repository and .Tag then "\(.Repository)@\(.Tag)" else "N/A" end' 2>/dev/null)
+
+                # Get open CVEs (again, adjust the command/format as needed).
+                CVES=$(docker scout cves "$image" 2>/dev/null || echo "None")
+                # Remove newlines from CVES so the Markdown table stays intact.
+                CVES=$(echo "$CVES" | tr '\n' ' ')
+
+                # Append a row to the Markdown table.
+                echo "| \`$image\` | $SHORT_META | $CVES |" >> $OUTPUT_FILE
+              done
+            done
+          fi
+          echo "Docker Scout Analysis:"
+          cat $OUTPUT_FILE
+          # Set the output so it can be used in the next step.
+          echo "::set-output name=result::$(cat $OUTPUT_FILE)"
+
+      # 5. Post the Markdown table as a comment on the PR.
+      - name: Comment on PR with Docker Scout results
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ${{ steps.analyze.outputs.result }}
