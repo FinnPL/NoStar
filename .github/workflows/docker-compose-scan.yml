@@ -33,7 +33,9 @@ jobs:
           fi
           echo "Changed docker-compose files:"
           echo "$CHANGED"
-          echo "files=$CHANGED" >> $GITHUB_OUTPUT
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Prepare Empty Report File
         run: |
