@@ -36,7 +36,7 @@ jobs:
           echo "files<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGED" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-
+  
       - name: Prepare Empty Report File
         run: |
           echo "Docker Compose Image Metadata and CVE Report" > report.txt
