@@ -61,6 +61,7 @@ services:
       - "HOMEPAGE_VAR_UNIFI_PASSWORD=${HOMEPAGE_VAR_UNIFI_PASSWORD}"
       - "HOMEPAGE_VAR_MAILCOW_API_KEY=${HOMEPAGE_VAR_MAILCOW_API_KEY}"
       - "HOMEPAGE_VAR_PORTAINER_API_KEY=${HOMEPAGE_VAR_PORTAINER_API_KEY}"
+      - "HOMEPAGE_ALLOWED_HOSTS=olympus.lippok.dev"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./homepage:/app/config
