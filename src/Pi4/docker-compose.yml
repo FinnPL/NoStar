@@ -73,7 +73,128 @@ services:
       - "traefik.http.routers.homepage.tls.certresolver=letsencrypt"
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
 
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.lippok.dev`)"
+      - "traefik.http.routers.prometheus.entrypoints=websecure"
+      - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - "traefik.http.routers.prometheus.middlewares=auth@file"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.lippok.dev`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node-exporter
+    restart: always
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    network_mode: host
+    pid: host
+    volumes:
+      - '/:/host:ro,rslave'
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /cgroup:/cgroup:ro
+
+  unpoller:
+    image: golift/unifi-poller:latest
+    container_name: unpoller
+    restart: always
+    environment:
+      - UP_UNIFI_DEFAULT_URL=https://10.10.0.1:8443
+      - UP_UNIFI_DEFAULT_USER=${HOMEPAGE_VAR_UNIFI_USER}
+      - UP_UNIFI_DEFAULT_PASS=${HOMEPAGE_VAR_UNIFI_PASSWORD}
+      - UP_UNIFI_DEFAULT_VERIFY_SSL=false
+      - UP_PROMETHEUS_HTTP_LISTEN=0.0.0.0:9130
+      - UP_PROMETHEUS_NAMESPACE=unpoller
+
+  unpoller-remote:
+    image: golift/unifi-poller:latest
+    container_name: unpoller-remote
+    restart: always
+    environment:
+      - UP_UNIFI_DEFAULT_URL=https://10.0.0.1:8443
+      - UP_UNIFI_DEFAULT_USER=${HOMEPAGE_VAR_UNIFI_USER}
+      - UP_UNIFI_DEFAULT_PASS=${HOMEPAGE_VAR_UNIFI_PASSWORD}
+      - UP_UNIFI_DEFAULT_VERIFY_SSL=false
+      - UP_PROMETHEUS_HTTP_LISTEN=0.0.0.0:9131
+      - UP_PROMETHEUS_NAMESPACE=unpoller_remote
+
+  mailcow-exporter:
+    image: ghcr.io/mailcow/prometheus-exporter:latest
+    container_name: mailcow-exporter
+    restart: always
+    environment:
+      - MAILCOW_HOSTNAME=mail.lippok.eu
+      - MAILCOW_API_KEY=${HOMEPAGE_VAR_MAILCOW_API_KEY}
+      - MAILCOW_SKIP_TLS_VERIFY=false
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    restart: always
+    volumes:
+      - ./alertmanager:/etc/alertmanager
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alertmanager.rule=Host(`alerts.lippok.dev`)"
+      - "traefik.http.routers.alertmanager.entrypoints=websecure"
+      - "traefik.http.routers.alertmanager.tls.certresolver=letsencrypt"
+      - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
+      - "traefik.http.routers.alertmanager.middlewares=auth@file"
+
 volumes:
   traefik_certs:
   portainer_data:
   gatus_data:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:

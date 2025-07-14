@@ -1,0 +1,79 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "rules/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter (Pi4 system metrics)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']  # Pi4 node-exporter runs in host mode
+    scrape_interval: 15s
+
+  # Traefik metrics
+  - job_name: 'traefik'
+    static_configs:
+      - targets: ['traefik:8082']
+    scrape_interval: 15s
+
+  # cAdvisor (Docker container metrics)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 15s
+
+  # UnPoller (Local UniFi controller - 10.10.0.1)
+  - job_name: 'unpoller-local'
+    static_configs:
+      - targets: ['unpoller:9130']
+    scrape_interval: 30s
+
+  # UnPoller (Remote UniFi controller - 10.0.0.1)
+  - job_name: 'unpoller-remote'
+    static_configs:
+      - targets: ['unpoller-remote:9131']
+    scrape_interval: 30s
+
+  # Mailcow exporter (mail.lippok.eu)
+  - job_name: 'mailcow'
+    static_configs:
+      - targets: ['mailcow-exporter:9099']
+    scrape_interval: 30s
+
+  # FritzBox exporter (192.168.178.1)
+  - job_name: 'fritzbox'
+    static_configs:
+      - targets: ['fritzbox-exporter:9133']
+    scrape_interval: 30s
+
+  # Gatus metrics
+  - job_name: 'gatus'
+    static_configs:
+      - targets: ['gatus:8080']
+    scrape_interval: 15s
+    metrics_path: '/metrics'
+
+  # Remote Pi3 system metrics
+  - job_name: 'node-exporter-pi3'
+    static_configs:
+      - targets: ['pi3.athena:9100']  # Install node-exporter on Pi3
+    scrape_interval: 15s
+
+  # Remote VPS metrics (for Mailcow server)
+  - job_name: 'node-exporter-vps'
+    static_configs:
+      - targets: ['mail.lippok.eu:9100']  # Install node-exporter on VPS
+    scrape_interval: 15s
