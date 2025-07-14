@@ -165,7 +165,7 @@ services:
       - UP_PROMETHEUS_NAMESPACE=unpoller_remote
 
   mailcow-exporter:
-    image: mailcow/prometheus-exporter:latest
+    image: ghcr.io/mailcow/prometheus-exporter:latest
     container_name: mailcow-exporter
     restart: always
     environment:
