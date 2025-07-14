@@ -95,7 +95,7 @@ services:
       - "traefik.http.routers.prometheus.entrypoints=websecure"
       - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
-      - "traefik.http.routers.prometheus.middlewares=auth@docker"
+      - "traefik.http.routers.prometheus.middlewares=auth@file"
 
   grafana:
     image: grafana/grafana:latest
@@ -189,7 +189,7 @@ services:
       - "traefik.http.routers.alertmanager.entrypoints=websecure"
       - "traefik.http.routers.alertmanager.tls.certresolver=letsencrypt"
       - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
-      - "traefik.http.routers.alertmanager.middlewares=auth@docker"
+      - "traefik.http.routers.alertmanager.middlewares=auth@file"
 
 volumes:
   traefik_certs:
