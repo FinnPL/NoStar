@@ -34,6 +34,9 @@ jobs:
                 echo 'HOMEPAGE_VAR_UNIFI_USER=${{ secrets.HOMEPAGE_VAR_UNIFI_USER }}' >> src/Pi4/.env
                 echo 'HOMEPAGE_VAR_UNIFI_PASSWORD=${{ secrets.HOMEPAGE_VAR_UNIFI_PASSWORD }}' >> src/Pi4/.env
                 echo 'HOMEPAGE_VAR_PORTAINER_API_KEY=${{ secrets.HOMEPAGE_VAR_PORTAINER_API_KEY }}' >> src/Pi4/.env
+                echo 'GRAFANA_ADMIN_PASSWORD=${{ secrets.GRAFANA_ADMIN_PASSWORD }}' >> src/Pi4/.env
+                echo 'FRITZBOX_USERNAME=${{ secrets.FRITZBOX_USERNAME }}' >> src/Pi4/.env
+                echo 'FRITZBOX_PASSWORD=${{ secrets.FRITZBOX_PASSWORD }}' >> src/Pi4/.env
             
             - name: Stop existing containers
               run: docker compose -f src/Pi4/docker-compose.yml down
