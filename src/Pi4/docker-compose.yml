@@ -145,7 +145,7 @@ services:
     container_name: unpoller
     restart: always
     environment:
-      - UP_UNIFI_DEFAULT_URL=https://10.10.0.1:8443
+      - UP_UNIFI_DEFAULT_URL=https://10.10.0.1
       - UP_UNIFI_DEFAULT_USER=${HOMEPAGE_VAR_UNIFI_USER}
       - UP_UNIFI_DEFAULT_PASS=${HOMEPAGE_VAR_UNIFI_PASSWORD}
       - UP_UNIFI_DEFAULT_VERIFY_SSL=false
@@ -157,7 +157,7 @@ services:
     container_name: unpoller-remote
     restart: always
     environment:
-      - UP_UNIFI_DEFAULT_URL=https://10.0.0.1:8443
+      - UP_UNIFI_DEFAULT_URL=https://10.0.0.1
       - UP_UNIFI_DEFAULT_USER=${HOMEPAGE_VAR_UNIFI_USER}
       - UP_UNIFI_DEFAULT_PASS=${HOMEPAGE_VAR_UNIFI_PASSWORD}
       - UP_UNIFI_DEFAULT_VERIFY_SSL=false
