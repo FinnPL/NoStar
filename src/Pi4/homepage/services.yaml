@@ -6,7 +6,7 @@
       widget:
         type: portainer
         url: "https://port.lippok.dev"
-        env: 2
+        env: 3
         key: {{HOMEPAGE_VAR_PORTAINER_API_KEY}}
 
   - Traefik:
@@ -69,7 +69,7 @@
       widget:
         type: portainer
         url: "https://port.lippok.dev"
-        env: 6
+        env: 5
         key: {{HOMEPAGE_VAR_PORTAINER_API_KEY}}
 
   - UptimeKuma:
