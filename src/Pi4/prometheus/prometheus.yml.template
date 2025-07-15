@@ -20,7 +20,7 @@ scrape_configs:
   # Node Exporter (Pi4 system metrics)
   - job_name: 'node-exporter'
     static_configs:
-      - targets: ['node-exporter:9100']  # Pi4 node-exporter runs in host mode
+      - targets: ['host.docker.internal:9100']  # Pi4 node-exporter runs in host mode
     scrape_interval: 15s
 
   # Traefik metrics
