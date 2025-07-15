@@ -169,9 +169,18 @@ services:
     container_name: mailcow-exporter
     restart: always
     environment:
-      - MAILCOW_HOSTNAME=mail.lippok.eu
-      - MAILCOW_API_KEY=${HOMEPAGE_VAR_MAILCOW_API_KEY}
+      - MAILCOW_EXPORTER_HOST=mail.lippok.eu
+      - MAILCOW_EXPORTER_API_KEY=${HOMEPAGE_VAR_MAILCOW_API_KEY}
       - MAILCOW_SKIP_TLS_VERIFY=false
+
+  fritzbox-exporter:
+    image: pdreker/fritz_exporter:latest
+    container_name: fritzbox-exporter
+    restart: always
+    environment:
+      - FRITZ_HOSTNAME=192.168.178.1
+      - FRITZ_USERNAME=${FRITZBOX_USERNAME}
+      - FRITZ_PASSWORD=${FRITZBOX_PASSWORD}
 
   alertmanager:
     image: prom/alertmanager:latest
