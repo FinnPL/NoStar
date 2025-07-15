@@ -11,7 +11,7 @@ route:
 receivers:
   - name: 'discord-notifications'
     webhook_configs:
-      - url: '${DISCORD_WEBHOOK_URL}'
+      - url: '${DISCORD_WEBHOOK_URL}/slack'
         send_resolved: true
 
 inhibit_rules:
