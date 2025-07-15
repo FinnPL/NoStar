@@ -12,7 +12,7 @@ jobs:
             contents: read
         steps:
             - name: Remove log file
-              run: sudo rm -f src/Pi4/homepage/logs/homepage.log
+              run: sudo rm -f src/Pi4/homepage/
 
             - name: Checkout repository
               uses: actions/checkout@v4
