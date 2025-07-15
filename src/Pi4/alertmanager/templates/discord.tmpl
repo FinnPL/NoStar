@@ -1,0 +1,15 @@
+{{ define "discord.title" }}
+[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .GroupLabels.SortedPairs.Values | join " " }} {{ if gt (len .CommonLabels) (len .GroupLabels) }}({{ with .CommonLabels.Remove .GroupLabels.Names }}{{ .Values | join " " }}{{ end }}){{ end }}
+{{ end }}
+
+{{ define "discord.content" }}
+{{ range .Alerts }}
+**Alert:** {{ .Annotations.summary | default .Annotations.message | default "No summary" }}
+{{ if .Annotations.description }}**Description:** {{ .Annotations.description }}{{ end }}
+**Status:** {{ .Status | title }}
+{{ if .Labels.severity }}**Severity:** {{ .Labels.severity | title }}{{ end }}
+{{ if .Labels.instance }}**Instance:** {{ .Labels.instance }}{{ end }}
+{{ if .GeneratorURL }}**Source:** {{ .GeneratorURL }}{{ end }}
+---
+{{ end }}
+{{ end }}
