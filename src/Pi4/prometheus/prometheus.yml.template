@@ -66,9 +66,3 @@ scrape_configs:
     static_configs:
       - targets: ['pi3.athena:9100']  # Install node-exporter on Pi3
     scrape_interval: 15s
-
-  # Remote VPS metrics (for Mailcow server)
-  - job_name: 'node-exporter-vps'
-    static_configs:
-      - targets: ['mail.lippok.eu:9100']  # Install node-exporter on VPS
-    scrape_interval: 15s
