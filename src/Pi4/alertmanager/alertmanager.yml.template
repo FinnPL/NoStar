@@ -13,6 +13,15 @@ receivers:
     webhook_configs:
       - url: '${DISCORD_WEBHOOK_URL}/slack'
         send_resolved: true
+        title: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+        text: |
+          {{ range .Alerts }}
+          **Alert:** {{ .Annotations.summary }}
+          **Description:** {{ .Annotations.description }}
+          **Status:** {{ .Status }}
+          **Severity:** {{ .Labels.severity }}
+          **Instance:** {{ .Labels.instance }}
+          {{ end }}
 
 inhibit_rules:
   - source_match:
