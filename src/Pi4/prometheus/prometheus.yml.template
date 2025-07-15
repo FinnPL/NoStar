@@ -52,6 +52,8 @@ scrape_configs:
     static_configs:
       - targets: ['mailcow-exporter:9099']
     scrape_interval: 30s
+    params:
+      token: ['${HOMEPAGE_VAR_MAILCOW_API_KEY}']
 
   # FritzBox exporter (192.168.178.1)
   - job_name: 'fritzbox'

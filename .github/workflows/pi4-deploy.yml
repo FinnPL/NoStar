@@ -37,6 +37,30 @@ jobs:
                 echo 'GRAFANA_ADMIN_PASSWORD=${{ secrets.GRAFANA_ADMIN_PASSWORD }}' >> src/Pi4/.env
                 echo 'FRITZBOX_USERNAME=${{ secrets.FRITZBOX_USERNAME }}' >> src/Pi4/.env
                 echo 'FRITZBOX_PASSWORD=${{ secrets.FRITZBOX_PASSWORD }}' >> src/Pi4/.env
+
+            - name: Generate config files from templates
+              run: |
+                # Set environment variables for envsubst
+                export TRAEFIK_USER='${{ secrets.TRAEFIK_USER }}'
+                export TRAEFIK_PASSWORD='${{ secrets.TRAEFIK_PASSWORD }}'
+                export TRAEFIK_PASSWORD_UNHASHED='${{ secrets.TRAEFIK_PASSWORD_UNHASHED }}'
+                export CF_DNS_API_TOKEN='${{ secrets.CF_DNS_API_TOKEN }}'
+                export CLOUDFLARE_EMAIL='${{ secrets.CLOUDFLARE_EMAIL }}'
+                export PORTAINER_PASSWORD='${{ secrets.PORTAINER_PASSWORD }}'
+                export DISCORD_WEBHOOK_URL='${{ secrets.DISCORD_WEBHOOK_URL }}'
+                export HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY='${{ secrets.HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY }}'
+                export HOMEPAGE_VAR_MAILCOW_API_KEY='${{ secrets.HOMEPAGE_VAR_MAILCOW_API_KEY }}'
+                export HOMEPAGE_VAR_UNIFI_USER='${{ secrets.HOMEPAGE_VAR_UNIFI_USER }}'
+                export HOMEPAGE_VAR_UNIFI_PASSWORD='${{ secrets.HOMEPAGE_VAR_UNIFI_PASSWORD }}'
+                export HOMEPAGE_VAR_PORTAINER_API_KEY='${{ secrets.HOMEPAGE_VAR_PORTAINER_API_KEY }}'
+                export GRAFANA_ADMIN_PASSWORD='${{ secrets.GRAFANA_ADMIN_PASSWORD }}'
+                export FRITZBOX_USERNAME='${{ secrets.FRITZBOX_USERNAME }}'
+                export FRITZBOX_PASSWORD='${{ secrets.FRITZBOX_PASSWORD }}'
+                
+                # Generate config files from templates
+                envsubst < src/Pi4/prometheus/prometheus.yml.template > src/Pi4/prometheus/prometheus.yml
+                envsubst < src/Pi4/traefik/traefik.yml.template > src/Pi4/traefik/traefik.yml
+                envsubst < src/Pi4/alertmanager/alertmanager.yml.template > src/Pi4/alertmanager/alertmanager.yml
             
             - name: Stop existing containers
               run: docker compose -f src/Pi4/docker-compose.yml down
