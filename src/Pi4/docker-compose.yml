@@ -172,6 +172,7 @@ services:
       - MAILCOW_EXPORTER_HOST=mail.lippok.eu
       - MAILCOW_EXPORTER_API_KEY=${HOMEPAGE_VAR_MAILCOW_API_KEY}
       - MAILCOW_SKIP_TLS_VERIFY=false
+      - MAILCOW_EXPORTER_INSECURE_DISABLE_ACCESS_PROTECTION=1
 
   fritzbox-exporter:
     image: pdreker/fritz_exporter:latest
