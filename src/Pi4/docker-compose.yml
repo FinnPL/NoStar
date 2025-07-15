@@ -89,6 +89,8 @@ services:
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.lippok.dev`)"
