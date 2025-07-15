@@ -13,8 +13,6 @@ receivers:
     webhook_configs:
       - url: '${DISCORD_WEBHOOK_URL}'
         send_resolved: true
-        title: 'Prometheus Alert'
-        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
 
 inhibit_rules:
   - source_match:
