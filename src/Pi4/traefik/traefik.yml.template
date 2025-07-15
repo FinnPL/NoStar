@@ -27,7 +27,7 @@ api:
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: yourmail           # cant be an env var :(
+      email: ${CLOUDFLARE_EMAIL}
       storage: /certs/acme.json
       dnsChallenge:
         provider: cloudflare
