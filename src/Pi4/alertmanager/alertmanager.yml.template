@@ -1,9 +1,6 @@
 global:
   # Global configuration options
 
-templates:
-  - '/etc/alertmanager/templates/*.tmpl'
-
 route:
   group_by: ['alertname']
   group_wait: 10s
@@ -13,12 +10,9 @@ route:
 
 receivers:
   - name: 'discord-notifications'
-    webhook_configs:
-      - url: '${DISCORD_WEBHOOK_URL}/slack'
+    discord_configs:
+      - webhook_url: '${DISCORD_WEBHOOK_URL}'
         send_resolved: true
-        username: 'Alertmanager'
-        title: '{{ template "discord.title" . }}'
-        text: '{{ template "discord.content" . }}'
 
 inhibit_rules:
   - source_match:
