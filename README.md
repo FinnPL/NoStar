@@ -5,10 +5,10 @@
 This repository contains the configuration files for my multi-site homelab setup, featuring automated CI/CD deployment, comprehensive monitoring, and networking.
 
 ## Network Architecture
+![NWD](https://github.com/user-attachments/assets/5e6225d0-8305-421c-8ee2-33f057eb3ace)
 
 ### Sites Overview
 The homelab consists of two geographically separated sites connected via VPN:
-![NWD](https://github.com/user-attachments/assets/5e6225d0-8305-421c-8ee2-33f057eb3ace)
 
 #### **Vieta Site** (Primary)
 - **Pi4**: Main orchestration node running Docker services
