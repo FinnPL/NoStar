@@ -46,6 +46,9 @@ Each site implements a dual-VLAN architecture:
 | **Alertmanager** | Alert Management | `alerts.lippok.dev` | :9093 |
 | **Gatus** | Uptime Monitoring | `gatus.lippok.dev` | :8080 |
 
+### Grafana Dashboard Overview
+<img width="2490" height="1168" alt="Grafana Dashboard" src="https://github.com/user-attachments/assets/07791433-1b55-47ba-9093-dac83537e6c2" />
+
 ### Data Collection & Exporters
 | Service | Target | Port | Metrics |
 |---------|--------|------|---------|
