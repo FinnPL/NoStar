@@ -144,8 +144,8 @@ Additionally, add all required environment variables as GitHub repository secret
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/FinnPL/NoStar.git
-   cd NoStar/src/Pi4
+   git clone https://github.com/FinnPL/Homelab-Setup.git
+   cd Homelab-Setup/src/Pi4
    ```
 
 2. **Create and configure `.env` file:**
